@@ -89,8 +89,7 @@ exports.blur = function blur(image) {
   for (let i = 0; i < image.length; i++) {
     for (let j = 0; j < image[i].length; j++) {
       const imageCopy = [...image]; // Create a separate copy of the image array
-      console.log('image copy');
-      console.log(imageCopy);
+
       // for each pixel
       let tempPixel = exports.blurPixel(j, i, imageCopy);
       blurredImage = [...exports.setPixel(j, i, blurredImage, tempPixel)];
@@ -101,16 +100,14 @@ exports.blur = function blur(image) {
 
 /// not working because blur is passing the mutated image into blurpixel
 exports.blurPixel = function blurPixel(x, y, image) {
-  console.log(image);
   const pixel = exports.getPixel(x, y, [...image]);
   // need to be passed a copy of image so it doesnt mutate the og
-  console.log(pixel);
   let rAvg = pixel[0];
   let gAvg = pixel[1];
   let bAvg = pixel[2];
   let divisor = 1;
 
-  /// for 0-4 get the index before and after and add to avg
+  /// for 1-6 get the index before and after and add to avg
   // check if it exists first
   for (let i = 1; i < 6; i++) {
     if (exports.getPixel(x + i, y, image)) {
@@ -146,7 +143,6 @@ exports.imageMap = function imageMap(image, func) {
   let result = image;
   for (let y = 0; y < image.length; ++y) {
     for (let x = 0; x < image[y].length; ++x) {
-      // const pixel = image.getPixel(x, y);
       const newPixel = func(image, x, y);
       result = exports.setPixel(x, y, result, newPixel);
     }
