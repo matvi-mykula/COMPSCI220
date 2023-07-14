@@ -7,17 +7,11 @@
 // image defined by  list of lists of pixels
 // pixel: [r,g,b]
 // image : [[[...],[...],[...]],[[...],[...],[...]][[...],[...],[...]]]
-const _ = require('lodash');
-
-// test
-exports.sum = function sum(x, y) {
-  return x + y;
-};
 
 // get pixel and set pixel utility functions
 // given an x and y and the whole picture return the [r,g,b]
 
-exports.getPixel = function getPixel(x, y, image) {
+function getPixel(x, y, image) {
   const height = image.length;
   const width = image[0].length;
 
@@ -27,35 +21,70 @@ exports.getPixel = function getPixel(x, y, image) {
   }
 
   return image[y][x];
-};
+}
 
 // set pixel by x and y
-exports.setPixel = function setPixel(x, y, image, newPixel) {
+function setPixel(x, y, image, newPixel) {
   const height = image.length;
   const width = image[0].length;
 
   if (x < 0 || x >= width || y < 0 || y >= height) {
     throw new Error('Invalid position: x or y is out of range');
   }
-  const newImage = [...image];
-  newImage[y][x] = newPixel;
+
+  // mishas method
+  // doesnt work because of edge cases??
+  // return [
+  //   [...image.slice(0, y)],
+  //   [...image[y].slice(0, x), newPixel, ...image[y].slice(x + 1)],
+  // if x is the last element the x+1 gonna get fucky
+  //   [...image.slice(y+1)],
+  // ];
+
+  let newImage = [];
+  for (let i = 0; i < image.length; i++) {
+    if (y !== i) {
+      newImage.push(image[i]);
+    } else {
+      let tempArray = [];
+      for (let j = 0; j < image[i].length; j++) {
+        if (i === y && j === x) {
+          tempArray.push(newPixel);
+        } else {
+          tempArray.push(image[i][j]);
+        }
+      }
+      newImage.push(tempArray);
+    }
+  }
+
   return newImage;
-};
+}
+
+// do i really need this?
+function makeDeepCopy(image) {
+  let newImage = [];
+  for (let i = 0; i < image.length; i++) {
+    newImage.push(image[i]);
+  }
+
+  return newImage;
+}
 
 // function that makes image red by removing blue and green pixels
-exports.removeBlueAndGreen = function removeBlueAndGreen(image) {
-  let redImage = image;
+function removeBlueAndGreen(image) {
+  let redImage = makeDeepCopy(image);
   for (let i = 0; i < image.length; i++) {
     for (let j = 0; j < image[i].length; j++) {
       redImage = exports.setPixel(j, i, redImage, [image[i][j][0], 0, 0]);
     }
   }
   return redImage;
-};
+}
 
 // function that makes an image grayscale by setting all colors to the same intensity
 // iterate through pixels and go from [r,g,b] => [m,m,m] which is the average of rgb
-exports.grayScale = function grayScale(image) {
+function grayScale(image) {
   let grayImage = image;
   for (let i = 0; i < image.length; i++) {
     for (let j = 0; j < image[i].length; j++) {
@@ -64,12 +93,12 @@ exports.grayScale = function grayScale(image) {
     }
   }
   return grayImage;
-};
+}
 
 // highlight the edges in the image by comparing the intesity of adjacent pixels
 // get grayscale image
 // for each pixel setpixel to [|m1-m2|,|m1-m2|,|m1-m2|]
-exports.highlight = function highlight(image) {
+function highlight(image) {
   let highlightImage = exports.grayScale(image);
 
   for (let i = 0; i < image.length; i++) {
@@ -80,12 +109,13 @@ exports.highlight = function highlight(image) {
     }
   }
   return highlightImage;
-};
+}
 
 // blur the image by averaging the colors of adjacent pixels
 // each pixels rgb should be average of 5 on each side values for each rgb + the pixel in question
-exports.blur = function blur(image) {
-  let blurredImage = _.cloneDeep(image);
+function blur(image) {
+  // need to make a seperate function to create deep copy
+  let blurredImage = [...image];
   for (let i = 0; i < image.length; i++) {
     for (let j = 0; j < image[i].length; j++) {
       const imageCopy = [...image]; // Create a separate copy of the image array
@@ -96,10 +126,10 @@ exports.blur = function blur(image) {
     }
   }
   return blurredImage;
-};
+}
 
 /// not working because blur is passing the mutated image into blurpixel
-exports.blurPixel = function blurPixel(x, y, image) {
+function blurPixel(x, y, image) {
   const pixel = exports.getPixel(x, y, [...image]);
   // need to be passed a copy of image so it doesnt mutate the og
   let rAvg = pixel[0];
@@ -135,7 +165,7 @@ exports.blurPixel = function blurPixel(x, y, image) {
     Math.round(gAvg / divisor),
     Math.round(bAvg / divisor)];
   return finalPixel;
-};
+}
 
 /// ///// Project 2
 
@@ -148,4 +178,8 @@ exports.imageMap = function imageMap(image, func) {
     }
   }
   return result;
+};
+
+module.exports = {
+  getPixel, setPixel, removeBlueAndGreen, blurPixel, blur, highlight, grayScale,
 };

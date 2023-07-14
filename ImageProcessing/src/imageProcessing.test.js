@@ -1,11 +1,7 @@
 // testing for imageProcessing
 const {
-  sum, getPixel, setPixel, removeBlueAndGreen, grayScale, highlight, blurPixel, blur, imageMap,
+  getPixel, setPixel, removeBlueAndGreen, grayScale, highlight, blurPixel, blur, imageMap,
 } = require('./imageProcessing');
-
-test('sum function should correctly add two numbers', () => {
-  expect(sum(2, 3)).toBe(5);
-});
 
 const testImage1 = [[[1, 2, 3]], [[1, 3, 5], [[123, 23, 45]]]];
 
